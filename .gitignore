@@ -1,5 +1,13 @@
+# Python Cache files
+__pycache__/
+
+# Shapefiles data
 *.zip
 
+# Local Environment files
 api_env/
 
-__pycache__/
+# Stress Test Output files
+jmeter.log
+test_results.jtl
+coordinates.csv
