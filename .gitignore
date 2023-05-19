@@ -1,3 +1,5 @@
 *.zip
 
 api_env/
+
+__pycache__/

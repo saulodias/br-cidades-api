@@ -27,7 +27,7 @@ Siga as instruções abaixo para configurar e executar o projeto:
 4. Instale as dependências do projeto. Execute o seguinte comando:
 
     ```bash
-    python -m pip install flask geopandas
+    python -m pip install "Flask[async]" geopandas
     ```
 
 ## Executando o servidor de teste
