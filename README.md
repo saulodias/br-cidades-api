@@ -2,6 +2,12 @@
 
 Este projeto é uma API Flask que permite consultar o município brasileiro correspondente a um par de coordenadas geográficas (latitude e longitude). Utiliza a biblioteca Geopandas para carregar dados geográficos dos municípios brasileiros e a biblioteca Shapely para realizar consultas espaciais.
 
+## Motivação
+
+A criação da **BR Cidades API** surge como uma solução alternativa diante dos altos custos associados às APIs de geolocalização existentes. Muitas vezes, essas APIs oferecem recursos avançados e abrangentes, mas com preços elevados que podem ser inacessíveis para alguns projetos de menor escala.
+
+A proposta da **BR Cidades API** é oferecer uma solução personalizada e econômica, focada apenas na localização por cidade. A ideia é aproveitar a rápida autorização de localização disponível em navegadores modernos, que permite obter as coordenadas do usuário de forma direta e eficiente. Ao utilizar essa abordagem, é possível dispensar a necessidade de uma API de geolocalização externa, reduzindo os custos associados.
+
 ## Instalação
 
 Siga as instruções abaixo para configurar e executar o projeto:
@@ -61,6 +67,35 @@ GET http://127.0.0.1:5000/city/-22.9029407,-43.1736189
 ```json
 {"city": "Rio de Janeiro", "uf": "RJ"}
 ```
+
+
+## Exemplo de consulta à API usando um navegador moderno
+
+Suponha que um usuário esteja utilizando um navegador moderno com suporte à geolocalização. Nesse caso, ele pode facilmente autorizar o acesso à sua localização atual. Com base nessas coordenadas, podemos fazer uma consulta à **BR Cidades API** para obter a cidade e o estado correspondentes.
+
+Aqui está um exemplo de como seria a consulta à API utilizando JavaScript em um navegador moderno:
+
+```javascript
+navigator.geolocation.getCurrentPosition(function(position) {
+  const latitude = position.coords.latitude;
+  const longitude = position.coords.longitude;
+  
+  // Fazendo a requisição à **BR Cidades API**
+  fetch(`http://127.0.0.1:5000/city/${latitude},${longitude}`)
+    .then(response => response.json())
+    .then(data => {
+      const city = data.city;
+      const uf = data.uf;
+      
+      console.log(`Cidade: ${city}, UF: ${uf}`);
+    })
+    .catch(error => {
+      console.error('Ocorreu um erro:', error);
+    });
+});
+```
+
+Nesse exemplo, utilizamos a função `getCurrentPosition` do objeto `navigator.geolocation` para obter as coordenadas de localização atual do usuário. Em seguida, fazemos uma requisição à **BR Cidades API** passando as coordenadas na URL. A resposta da API retorna um objeto JSON com a cidade e o estado correspondentes, que são exibidos no console do navegador.
 
 ## Contribuição
 
