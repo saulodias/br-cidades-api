@@ -1,0 +1,22 @@
+# Use a Python base image
+FROM python:3.9-slim
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the requirements.txt file to the container
+COPY requirements.txt .
+
+# Install the Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt gunicorn
+
+# Copy the application code to the container
+COPY api.py .
+COPY municipality_query.py .
+COPY BR_Municipios_2022.zip .
+
+# Expose the port that Gunicorn will listen on (e.g., 5000)
+EXPOSE 5000
+
+# Set the command to run the Gunicorn server
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "api:app"]

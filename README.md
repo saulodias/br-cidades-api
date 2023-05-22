@@ -12,23 +12,24 @@ A proposta da **BR Cidades API** é oferecer uma solução personalizada e econ�
 
 Siga as instruções abaixo para configurar e executar o projeto:
 
-1. Faça o download do arquivo `BR_Municipios_2022.zip` contendo os dados dos municípios brasileiros no site do IBGE através do link: [IBGE - Malhas Territoriais](https://www.ibge.gov.br/geociencias/organizacao-do-territorio/malhas-territoriais/15774-malhas.html). 
-    > [Link direto para municípios (2022)](https://geoftp.ibge.gov.br/organizacao_do_territorio/malhas_territoriais/malhas_municipais/municipio_2022/Brasil/BR/BR_Municipios_2022.zip)
+1. Faça o download do arquivo `BR_Municipios_2022.zip` contendo os dados dos municípios brasileiros no site do IBGE através do link: [IBGE - Malhas Territoriais](https://www.ibge.gov.br/geociencias/organizacao-do-territorio/malhas-territoriais/15774-malhas.html).
+
+   > [Link direto para municípios (2022)](https://geoftp.ibge.gov.br/organizacao_do_territorio/malhas_territoriais/malhas_municipais/municipio_2022/Brasil/BR/BR_Municipios_2022.zip)
 
 2. Coloque o arquivo `BR_Municipios_2022.zip` no mesmo diretório do arquivo `api.py` do projeto.
 
 3. É recomendado criar um ambiente virtual para isolar as dependências do projeto. Utilize o seguinte comando para criar e ativar o ambiente virtual:
 
-    ```bash
-    python -m venv api_env
-    .\api_env\Scripts\activate
-    ```
+   ```bash
+   python -m venv api_env
+   .\api_env\Scripts\activate
+   ```
 
 4. Instale as dependências do projeto. Execute o seguinte comando:
 
-    ```bash
-    python -m pip install "Flask[async]" geopandas
-    ```
+   ```bash
+   python -m pip install -r requirements.txt
+   ```
 
 ## Executando o servidor de teste
 
@@ -51,7 +52,6 @@ A API possui um único endpoint:
 
 Para fazer uma consulta, substitua `<coordinates>` pelas coordenadas geográficas desejadas no formato "latitude,longitude". A API retornará um JSON com as informações do município correspondente ou uma mensagem de erro caso não seja encontrado nenhum município para as coordenadas fornecidas.
 
-
 ## Exemplo de consulta de município por coordenadas
 
 ### Coordenadas
@@ -65,9 +65,60 @@ GET http://127.0.0.1:5000/city/-22.9029407,-43.1736189
 ### Resultado
 
 ```json
-{"city": "Rio de Janeiro", "uf": "RJ"}
+{ "city": "Rio de Janeiro", "uf": "RJ" }
 ```
 
+## Deploy em Produção usando Docker
+
+Para implantar a API em um ambiente de produção usando o Docker, siga as etapas abaixo:
+
+1. Faça o download do arquivo `BR_Municipios_2022.zip` contendo os dados dos municípios brasileiros no site do IBGE através do link: [IBGE - Malhas Territoriais](https://www.ibge.gov.br/geociencias/organizacao-do-territorio/malhas-territoriais/15774-malhas.html).
+
+   > [Link direto para municípios (2022)](https://geoftp.ibge.gov.br/organizacao_do_territorio/malhas_territoriais/malhas_municipais/municipio_2022/Brasil/BR/BR_Municipios_2022.zip)
+
+2. Coloque o arquivo `BR_Municipios_2022.zip` no mesmo diretório do arquivo `api.py` do projeto.
+
+3. Crie um arquivo `Dockerfile.prod` com o seguinte conteúdo:
+
+   ```docker
+   # Use a Python base image
+   FROM python:3.9-slim
+
+   # Set the working directory inside the container
+   WORKDIR /app
+
+   # Copy the requirements.txt file to the container
+   COPY requirements.txt .
+
+   # Install the Python dependencies
+   RUN pip install --no-cache-dir -r requirements.txt gunicorn
+
+   # Copy the application code to the container
+   COPY api.py .
+   COPY municipality_query.py .
+   COPY BR_Municipios_2022.zip .
+
+   # Expose the port that Gunicorn will listen on (e.g., 5000)
+   EXPOSE 5000
+
+   # Set the command to run the Gunicorn server
+   CMD ["gunicorn", "--bind", "0.0.0.0:5000", "api:app"]
+
+   ```
+
+4. Build a imagem Docker de produção usando o Dockerfile.prod. Execute o seguinte comando a partir do diretório do projeto:
+
+   ```bash
+   docker build -f Dockerfile.prod -t br-cidades-api-prod .
+   ```
+
+5. Execute o servidor Docker de produção. Execute o seguinte comando:
+
+   ```bash
+   docker run -p 5000:5000 br-cidades-api-prod
+   ```
+
+Isso mapeia a porta 5000 do contêiner para a porta 5000 do host, permitindo o acesso à API Flask em http://localhost:5000.
 
 ## Exemplo de consulta à API usando um navegador moderno
 
@@ -76,21 +127,21 @@ Suponha que um usuário esteja utilizando um navegador moderno com suporte à ge
 Aqui está um exemplo de como seria a consulta à API utilizando JavaScript em um navegador moderno:
 
 ```javascript
-navigator.geolocation.getCurrentPosition(function(position) {
+navigator.geolocation.getCurrentPosition(function (position) {
   const latitude = position.coords.latitude;
   const longitude = position.coords.longitude;
-  
+
   // Fazendo a requisição à **BR Cidades API**
   fetch(`http://127.0.0.1:5000/city/${latitude},${longitude}`)
-    .then(response => response.json())
-    .then(data => {
+    .then((response) => response.json())
+    .then((data) => {
       const city = data.city;
       const uf = data.uf;
-      
+
       console.log(`Cidade: ${city}, UF: ${uf}`);
     })
-    .catch(error => {
-      console.error('Ocorreu um erro:', error);
+    .catch((error) => {
+      console.error("Ocorreu um erro:", error);
     });
 });
 ```
@@ -104,5 +155,3 @@ Contribuições são bem-vindas! Se você encontrar algum problema ou tiver suge
 ## Licença
 
 Este projeto está licenciado sob a Licença MIT. Consulte o arquivo `LICENSE` para obter mais informações.
-
-
