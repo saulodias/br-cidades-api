@@ -9,7 +9,7 @@ min_longitude = -74.997126
 max_longitude = -32.692631
 
 # Define the number of coordinates to generate
-num_coordinates = 1000
+num_coordinates = 5000
 
 # Check if the CSV file already exists
 csv_file = 'coordinates.csv'

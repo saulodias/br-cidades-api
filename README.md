@@ -102,7 +102,7 @@ Para implantar a API em um ambiente de produção usando o Docker, siga as etapa
    EXPOSE 5000
 
    # Set the command to run the Gunicorn server
-   CMD ["gunicorn", "--bind", "0.0.0.0:5000", "api:app"]
+   CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "api:app"]
 
    ```
 
